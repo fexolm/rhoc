@@ -29,16 +29,15 @@ build_package: &build_package
   if: tag IS present
   script: make GOOS=$GOOS
 
-deploy: &deploy
-  stage: deploy
+deployment: &deployment
+  stage: deployment
   install: skip
   if: tag IS present
   deploy:
     - provider: releases
       api_key:
         secure: $GITHUB_API_KEY
-      file: $DEPLOY_FILE
-      skip_cleanup: true
+      cleanup: false
 
 jobs:
   include:
@@ -87,20 +86,17 @@ jobs:
       script: golangci-lint run --config CI/golangci_optional_linters.yml cmd/... pkg/...
       os: linux
 
-    - <<: *deploy
+    - <<: *deployment
       env:
         - GOOS=linux
-        - DEPLOY_FILE=package-linux-amd64-.tar.gz
       os: linux
 
-    - <<: *deploy
+    - <<: *deployment
       env:
         - GOOS=windows
-        - DEPLOY_FILE=package-windows-amd64-.tar.gz
       os: windows
 
-    - <<: *deploy
+    - <<: *deployment
       env:
         - GOOS=darwin
-        - DEPLOY_FILE=package-darwin-amd64-.tar.gz
-      os: darwin
+      os: osx
