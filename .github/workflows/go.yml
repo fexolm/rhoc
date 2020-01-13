@@ -18,3 +18,23 @@ jobs:
 
     - name: Build
       run: make
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@master
+      with:
+        name: build-result
+        path: build
+      
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@master
+        with:
+          name: build-result
+          path: build
+      - name: Run tests
+        run: cat build
+        
+    
